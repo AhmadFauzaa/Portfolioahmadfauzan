@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Ahmad Fauzan - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1abc9c; /* Warna Teal sesuai gambar */
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #16a085; border-radius: 4px; }
+
+        /* Badge Styling */
+        .info-badge {
+            background-color: #00cba9;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 100px;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sidebar Item Hover */
+        .nav-item { cursor: pointer; transition: all 0.3s; }
+        .nav-item:hover, .nav-item.active {
+            color: #1abc9c;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        /* Floating Token Button */
+        .token-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            color: #1abc9c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 50;
+            transition: transform 0.2s;
+        }
+        .token-btn:hover { transform: scale(1.1); }
+
+        /* Skill Bar Animation */
+        .skill-bar-fill {
+            transition: width 1.5s ease-in-out;
+            width: 0;
+        }
+
+        /* Chatbot Styling */
+        .chatbot-toggler {
+            position: fixed;
+            bottom: 30px;
+            right: 35px;
+            outline: none;
+            border: none;
+            height: 50px;
+            width: 50px;
+            display: flex;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #fff;
+            color: #1abc9c;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 128px 0 rgba(0,0,0,0.1), 0 32px 64px -48px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .chatbot-toggler:hover { transform: scale(1.1); }
+        
+        .chatbot {
+            position: fixed;
+            right: 35px;
+            bottom: 90px;
+            width: 350px;
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+            transform-origin: bottom right;
+            box-shadow: 0 0 128px 0 rgba(0,0,0,0.1), 0 32px 64px -48px rgba(0,0,0,0.5);
+            transition: all 0.1s ease;
+            z-index: 1001;
+        }
+        body.show-chatbot .chatbot {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+        .chat-header {
+            background: #1abc9c;
+            padding: 16px 0;
+            text-align: center;
+            position: relative;
+        }
+        .chat-header h2 {
+            color: #fff;
+            font-size: 1.4rem;
+        }
+        .chatbox {
+            overflow-y: auto;
+            height: 300px;
+            padding: 15px 20px 70px;
+            background: #fbfbfb;
+        }
+        .chat-input {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #fff;
+            padding: 3px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
+        }
+        .chat-input textarea {
+            height: 55px;
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            max-height: 180px;
+            padding: 15px 15px 15px 0;
+            font-size: 0.95rem;
+        }
+        .chat-input span {
+            align-self: flex-end;
+            color: #1abc9c;
+            cursor: pointer;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            visibility: hidden;
+            font-size: 1.35rem;
+        }
+        .chat-input textarea:valid ~ span { visibility: visible; }
+        
+        .chatbox .chat { display: flex; list-style: none; margin-bottom: 15px; }
+        .chatbox .outgoing { justify-content: flex-end; margin: 20px 0; }
+        .chatbox .chat p {
+            white-space: pre-wrap;
+            padding: 12px 16px;
+            border-radius: 10px 10px 0 10px;
+            max-width: 75%;
+            color: #fff;
+            font-size: 0.95rem;
+            background: #1abc9c;
+        }
+        .chatbox .incoming p {
+            border-radius: 10px 10px 10px 0;
+            color: #000;
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- =======================
+         HALAMAN LOGIN
+    ======================== -->
+    <div id="login-section" class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md fade-in relative">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-500 text-3xl">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                <p class="text-gray-500 text-sm">Please login to access the portfolio</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-teal-500" id="username" type="text" placeholder="Enter your name" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="token">Token Access</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:border-teal-500" id="token" type="password" placeholder="Enter token" required>
+                    <p class="text-xs text-red-500 hidden" id="error-msg">Token salah! Klik tombol ! di pojok kiri.</p>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="w-full bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300" type="button" onclick="handleLogin(event)">
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tombol Rahasia Token -->
+        <button class="token-btn" onclick="showTokenInfo()" title="Dapatkan Token">
+            !
+        </button>
+    </div>
+
+    <!-- =======================
+         HALAMAN UTAMA (PORTFOLIO)
+    ======================== -->
+    <div id="main-section" class="hidden w-full h-screen overflow-hidden flex flex-col">
+        
+        <!-- Top Bar (User Profile) -->
+        <div class="w-full flex justify-end p-4 absolute top-0 right-0 z-20 pointer-events-none">
+            <div class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-3 pointer-events-auto">
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">Logged in as</p>
+                    <p id="display-username" class="font-bold text-teal-600 leading-none">User</p>
+                </div>
+                <div class="w-8 h-8 bg-teal-500 rounded-full text-white flex items-center justify-center">
+                    <i class="fas fa-user"></i>
+                </div>
+                <button onclick="logout()" class="ml-2 text-red-400 hover:text-red-600 text-sm" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Container -->
+        <div class="flex flex-col md:flex-row h-full items-center justify-center p-4 md:p-10 gap-6 w-full max-w-7xl mx-auto mt-10 md:mt-0">
+            
+            <!-- LEFT SIDEBAR (Navigation) -->
+            <!-- FIXED: Added border-r and consistent height/shadow -->
+            <div class="bg-white w-full md:w-1/4 h-[600px] rounded-lg shadow-xl flex flex-col justify-center items-center relative fade-in z-10">
+                <ul class="text-center space-y-4 text-2xl font-bold text-gray-700">
+                    <li class="nav-item text-teal-500 active" onclick="switchTab('about', this)">About</li>
+                    <li class="nav-item hover:text-teal-500" onclick="switchTab('experience', this)">Experience</li>
+                    <li class="nav-item hover:text-teal-500" onclick="switchTab('blogs', this)">Blogs</li>
+                    <li class="nav-item hover:text-teal-500" onclick="switchTab('services', this)">Services</li>
+                    <li class="nav-item hover:text-teal-500" onclick="switchTab('contact', this)">Contact</li>
+                </ul>
+
+                <!-- Close Button -->
+                <div class="absolute bottom-0 w-full border-t border-gray-200 py-3 text-center cursor-pointer hover:bg-gray-100 rounded-b-lg">
+                    <span class="text-3xl font-bold text-black">&times;</span>
+                </div>
+            </div>
+
+            <!-- RIGHT CONTENT (Details) -->
+            <!-- FIXED: bg-white applied here to ensure WHITE BOX for ALL tabs -->
+            <div class="bg-white w-full md:w-3/4 h-[600px] rounded-lg shadow-xl p-8 overflow-y-auto fade-in relative scroll-smooth z-10">
+                
+                <!-- Section: ABOUT ME -->
+                <div id="content-about">
+                    <div class="border-b-4 border-black inline-block mb-6">
+                        <h1 class="text-3xl font-bold text-black uppercase">About <span class="text-teal-500">Me</span></h1>
+                    </div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="relative">
+                            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200">
+                                <img src="AHMAD.png" alt="Profile">
+                            </div>
+                            <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="w-20 h-20 rounded-full overflow-hidden border-2 border-yellow-400 p-1 bg-white">
+                             <div class="w-full h-full bg-white-700 rounded-full flex items-center justify-center text-white text-xs text-center font-bold">
+                                <img src="LOGOSMK.png" alt="Profile">
+                             </div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-700 mb-8 text-sm md:text-base leading-relaxed">
+                        Assalamualaikum wr wb haloo saya ahmad fauzan saya seorang pelajar di SMK NEGERI 1 GEDONG TATAAN Saya berfokus pada jurusan saya yaitu RPL Dengan memfokuskan ke program dan pembuatan website / Design
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                        <!-- Data fields same as before -->
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Tanggal Lahir saya</span>
+                            <span class="text-gray-800 font-medium">June 8, 2008</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Address</span>
+                            <span class="text-gray-800 font-medium text-right">Pesawaran, Lampung</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Gender</span>
+                            <span class="text-gray-800 font-medium">Laki Laki</span>
+                        </div>
+                         <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Contact</span>
+                            <span class="text-gray-800 font-medium">+62 895 2577 5023</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Umur</span>
+                            <span class="text-gray-800 font-medium">17 Years Old</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Email</span>
+                            <span class="text-gray-800 font-medium truncate ml-2">fauzan3733@gmail.com</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Status</span>
+                            <span class="text-gray-800 font-medium">Pelajar</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Website</span>
+                            <span class="text-gray-800 font-medium text-xs truncate ml-2">ahmadfauzanxipplg.blogspot.com</span>
+                        </div>
+                         <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Asal</span>
+                            <span class="text-gray-800 font-medium">Gading Rejo</span>
+                        </div>
+                        <div class="flex justify-between items-start border-b border-gray-100 pb-2">
+                            <span class="info-badge mt-1">Kegiatan<br>hari libur</span>
+                            <span class="text-gray-800 font-medium text-right w-1/2">Pergi Ke Ladang Dan bermain Bersama Teman</span>
+                        </div>
+                         <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <span class="info-badge">Agama</span>
+                            <span class="text-gray-800 font-medium">Islam</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: EXPERIENCE -->
+                <div id="content-experience" class="hidden">
+                    <div class="border-b-4 border-black inline-block mb-6">
+                        <h1 class="text-3xl font-bold text-black uppercase">My <span class="text-teal-500">Experience</span></h1>
+                    </div>
+
+                    <!-- Tech Stack Logos -->
+                    <div class="flex justify-around items-center mb-10 bg-gray-50 p-4 rounded-xl shadow-inner">
+                        <div class="text-center transition hover:scale-110 duration-300">
+                            <i class="fab fa-html5 text-5xl text-orange-500 mb-2"></i>
+                            <p class="font-bold text-sm">HTML</p>
+                        </div>
+                        <div class="text-center transition hover:scale-110 duration-300">
+                            <i class="fab fa-css3-alt text-5xl text-blue-500 mb-2"></i>
+                            <p class="font-bold text-sm">CSS</p>
+                        </div>
+                        <div class="text-center transition hover:scale-110 duration-300">
+                            <i class="fab fa-js text-5xl text-yellow-400 mb-2"></i>
+                            <p class="font-bold text-sm">JavaScript</p>
+                        </div>
+                        <div class="text-center transition hover:scale-110 duration-300">
+                            <i class="fab fa-php text-5xl text-purple-600 mb-2"></i>
+                            <p class="font-bold text-sm">PHP</p>
+                        </div>
+                    </div>
+
+                    <!-- Skills Bars -->
+                    <h3 class="text-xl font-bold mb-4 border-l-4 border-teal-500 pl-3">Coding Skills</h3>
+                    <div class="space-y-4 mb-10">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">HTML</span>
+                                <span class="text-sm font-medium text-teal-600">90%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-orange-500 h-2.5 rounded-full skill-bar-fill" style="width: 0%" data-width="90%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">CSS</span>
+                                <span class="text-sm font-medium text-teal-600">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-500 h-2.5 rounded-full skill-bar-fill" style="width: 0%" data-width="85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">JavaScript</span>
+                                <span class="text-sm font-medium text-teal-600">80%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-yellow-400 h-2.5 rounded-full skill-bar-fill" style="width: 0%" data-width="80%"></div>
+                            </div>
+                        </div>
+                         <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-gray-700">PHP</span>
+                                <span class="text-sm font-medium text-teal-600">89%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-purple-600 h-2.5 rounded-full skill-bar-fill" style="width: 0%" data-width="89%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education History -->
+                    <h3 class="text-xl font-bold mb-4 border-l-4 border-teal-500 pl-3">Education History</h3>
+                    <div class="border-l-2 border-teal-200 ml-3 space-y-6 pb-4">
+                        <div class="relative pl-8">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-teal-500 rounded-full border-2 border-white"></div>
+                            <h4 class="font-bold text-lg text-gray-800">SMKN 1 GEDONG TATAAN</h4>
+                            <span class="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded">2023 - 2026 (Sekarang)</span>
+                            <p class="text-gray-600 text-sm mt-1">Jurusan Rekayasa Perangkat Lunak (RPL). Fokus pada pengembangan website, desain antarmuka, dan backend logic.</p>
+                        </div>
+                        <div class="relative pl-8">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-teal-300 rounded-full border-2 border-white"></div>
+                            <h4 class="font-bold text-lg text-gray-800">SMP 17.1 GEDONG TATAAN</h4>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">2020 - 2023</span>
+                            <p class="text-gray-600 text-sm mt-1">Lulus dengan nilai baik. Aktif dalam kegiatan ekstrakurikuler komputer dasar.</p>
+                        </div>
+                        <div class="relative pl-8">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-gray-300 rounded-full border-2 border-white"></div>
+                            <h4 class="font-bold text-lg text-gray-800">SDN 5 GEDONG TATAAN</h4>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">2015 - 2020</span>
+                            <p class="text-gray-600 text-sm mt-1">Pendidikan dasar. Membangun fondasi belajar yang kuat.</p>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Section: BLOGS -->
+                 <div id="content-blogs" class="hidden">
+                    <div class="border-b-4 border-black inline-block mb-6">
+                        <h1 class="text-3xl font-bold text-black uppercase">My <span class="text-teal-500">Blogs</span></h1>
+                    </div>
+                    <div class="grid gap-6">
+                        <!-- Blog Card 1 -->
+                        <div class="bg-gray-50 p-4 rounded-lg shadow border-l-4 border-teal-500 hover:shadow-lg transition">
+                            <h3 class="font-bold text-lg text-gray-800">Belajar Laravel untuk Pemula</h3>
+                            <p class="text-xs text-gray-400 mb-2"><i class="far fa-calendar-alt"></i> 12 Nov 2024</p>
+                            <p class="text-sm text-gray-600">Pengalaman pertama saya menggunakan framework PHP Laravel. Ternyata routing dan MVC itu sangat memudahkan...</p>
+                            <button class="mt-2 text-teal-500 text-sm font-bold hover:underline">Baca Selengkapnya &rarr;</button>
+                        </div>
+                        <!-- Blog Card 2 -->
+                        <div class="bg-gray-50 p-4 rounded-lg shadow border-l-4 border-teal-500 hover:shadow-lg transition">
+                            <h3 class="font-bold text-lg text-gray-800">Tips Desain UI yang Bersih</h3>
+                            <p class="text-xs text-gray-400 mb-2"><i class="far fa-calendar-alt"></i> 25 Okt 2024</p>
+                            <p class="text-sm text-gray-600">Warna teal dan putih memberikan kesan modern. Berikut adalah palet warna favorit saya...</p>
+                            <button class="mt-2 text-teal-500 text-sm font-bold hover:underline">Baca Selengkapnya &rarr;</button>
+                        </div>
+                         <!-- Blog Card 3 -->
+                         <div class="bg-gray-50 p-4 rounded-lg shadow border-l-4 border-teal-500 hover:shadow-lg transition">
+                            <h3 class="font-bold text-lg text-gray-800">Kegiatan di Ladang</h3>
+                            <p class="text-xs text-gray-400 mb-2"><i class="far fa-calendar-alt"></i> 10 Okt 2024</p>
+                            <p class="text-sm text-gray-600">Di hari libur, saya suka membantu orang tua di ladang. Ini menyeimbangkan hidup coding saya...</p>
+                            <button class="mt-2 text-teal-500 text-sm font-bold hover:underline">Baca Selengkapnya &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Section: SERVICES -->
+                 <div id="content-services" class="hidden">
+                    <div class="border-b-4 border-black inline-block mb-6">
+                        <h1 class="text-3xl font-bold text-black uppercase">My <span class="text-teal-500">Services</span></h1>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm text-center hover:border-teal-500 transition group">
+                            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600 text-2xl group-hover:bg-teal-500 group-hover:text-white transition">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-lg">Web Development</h3>
+                            <p class="text-sm text-gray-500 mt-2">Pembuatan website responsif menggunakan HTML, CSS, PHP, dan JS sesuai kebutuhan.</p>
+                        </div>
+                        
+                        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm text-center hover:border-teal-500 transition group">
+                            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600 text-2xl group-hover:bg-teal-500 group-hover:text-white transition">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-lg">UI/UX Design</h3>
+                            <p class="text-sm text-gray-500 mt-2">Merancang tampilan antarmuka yang menarik, modern, dan mudah digunakan (User Friendly).</p>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 p-6 rounded-xl shadow-sm text-center hover:border-teal-500 transition group">
+                            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-600 text-2xl group-hover:bg-teal-500 group-hover:text-white transition">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-lg">Responsive Design</h3>
+                            <p class="text-sm text-gray-500 mt-2">Memastikan website anda terlihat bagus di semua perangkat, mulai dari HP hingga Desktop.</p>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Section: CONTACT -->
+                 <div id="content-contact" class="hidden">
+                    <div class="border-b-4 border-black inline-block mb-6">
+                        <h1 class="text-3xl font-bold text-black uppercase">Contact <span class="text-teal-500">Me</span></h1>
+                    </div>
+                    
+                    <div class="flex flex-col gap-6">
+                        <!-- Map Section -->
+                        <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                            <iframe 
+                                src="https://www.google.com/maps?q=J546+FRG,+Wiyono,+Kec.+Gedong+Tataan,+Kabupaten+Pesawaran,+Lampung&output=embed" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy">
+                            </iframe>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded shadow-sm">
+                                <h4 class="font-bold text-teal-600"><i class="fas fa-map-marker-alt mr-2"></i> Address</h4>
+                                <p class="text-sm text-gray-700">J546+FRG, Wiyono, Kec. Gedong Tataan, Kabupaten Pesawaran, Lampung</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded shadow-sm">
+                                <h4 class="font-bold text-teal-600"><i class="fas fa-envelope mr-2"></i> Email</h4>
+                                <p class="text-sm text-gray-700">fauzan3733@gmail.com</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded shadow-sm">
+                                <h4 class="font-bold text-teal-600"><i class="fas fa-phone mr-2"></i> WhatsApp</h4>
+                                <p class="text-sm text-gray-700">+62 895 2577 5023</p>
+                            </div>
+                             <div class="bg-gray-50 p-4 rounded shadow-sm">
+                                <h4 class="font-bold text-teal-600"><i class="fas fa-globe mr-2"></i> Blog</h4>
+                                <p class="text-sm text-gray-700">ahmadfauzanxipplg.blogspot.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- CHATBOT WIDGET -->
+    <button class="chatbot-toggler" onclick="document.body.classList.toggle('show-chatbot')">
+        <span class="material-symbols-rounded"><i class="fas fa-comment"></i></span>
+    </button>
+    <div class="chatbot">
+        <header class="chat-header">
+            <h2>AI Assistant</h2>
+            <span onclick="document.body.classList.remove('show-chatbot')" class="absolute right-4 top-4 text-white cursor-pointer hover:text-gray-200 text-xl">&times;</span>
+        </header>
+        <ul class="chatbox" id="chatbox">
+            <li class="chat incoming">
+                <span class="material-symbols-outlined text-teal-600 mr-2"><i class="fas fa-robot"></i></span>
+                <p>Halo! Saya AI Assistant Ahmad Fauzan. Tanyakan apa saja tentang skill, pengalaman, project Fauzan, atau pertanyaan umum lainnya!</p>
+            </li>
+        </ul>
+        <div class="chat-input">
+            <textarea id="chat-input" placeholder="Ketik pesan..." required></textarea>
+            <span id="send-btn" class="material-symbols-rounded"><i class="fas fa-paper-plane"></i></span>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Token Rahasia
+        const SECRET_TOKEN = "FAUZAN123";
+
+        // Variabel untuk menyimpan riwayat chat (untuk konteks)
+        let chatHistory = [{
+            role: "system",
+            parts: [{
+                text: "Anda adalah AI Assistant Ahmad Fauzan, seorang pelajar RPL dari SMKN 1 Gedong Tataan. Jawablah pertanyaan dalam Bahasa Indonesia dengan ramah, informal, dan santai (gunakan kata 'saya' untuk merujuk pada Fauzan, dan 'Anda' untuk merujuk pada pengguna). Jika pertanyaan berkaitan dengan Ahmad Fauzan, gunakan data dari portofolio (Skill, Sekolah, Alamat, dll). Untuk pertanyaan umum, gunakan pengetahuan umum Anda. Jaga agar jawaban Anda ringkas, informatif, dan sesuai persona."
+            }]
+        }];
+
+        // Logic untuk menampilkan token ketika tombol ! ditekan
+        function showTokenInfo() {
+            alert(` TOKEN AKSES ANDA: ${SECRET_TOKEN}\n\nSilahkan salin dan masukkan ke kolom Token.`);
+        }
+
+        // Logic Login
+        function handleLogin(event) {
+            if(event) event.preventDefault();
+            const usernameInput = document.getElementById('username').value;
+            const tokenInput = document.getElementById('token').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (tokenInput === SECRET_TOKEN) {
+                // Simpan login user
+                localStorage.setItem('portfolio_user', usernameInput);
+                openMainPage(usernameInput);
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('token').classList.add('border-red-500');
+            }
+        }
+
+        // Fungsi membuka halaman utama
+        function openMainPage(username) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('flex');
+            const mainSection = document.getElementById('main-section');
+            mainSection.classList.remove('hidden');
+            mainSection.classList.add('flex');
+            document.getElementById('display-username').textContent = username;
+        }
+
+        function logout() {
+            localStorage.removeItem('portfolio_user');
+            location.reload();
+        }
+
+        // ACTIVE AUTO LOGIN
+        window.onload = function() {
+            const savedUser = localStorage.getItem('portfolio_user');
+            // Jika ada data user tersimpan, langsung buka halaman utama
+            if (savedUser) { 
+                openMainPage(savedUser); 
+            }
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabName, element) {
+            const contents = ['about', 'experience', 'blogs', 'services', 'contact'];
+            contents.forEach(id => {
+                document.getElementById('content-' + id).classList.add('hidden');
+            });
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(item => item.classList.remove('text-teal-500', 'active', 'font-bold'));
+            
+            if(element) {
+                element.classList.add('text-teal-500', 'active', 'font-bold');
+            }
+
+            // Animate Skill Bars if opening experience
+            if (tabName === 'experience') {
+                setTimeout(() => {
+                    const bars = document.querySelectorAll('.skill-bar-fill');
+                    bars.forEach(bar => {
+                        bar.style.width = bar.getAttribute('data-width');
+                    });
+                }, 100);
+            } else {
+                 // Reset width to animate again next time
+                 const bars = document.querySelectorAll('.skill-bar-fill');
+                 bars.forEach(bar => {
+                    bar.style.width = '0%';
+                });
+            }
+        }
+
+        /* --- CHATBOT LOGIC --- */
+        const chatInput = document.getElementById("chat-input");
+        const sendBtn = document.getElementById("send-btn");
+        const chatbox = document.getElementById("chatbox");
+        const apiKey = "AIzaSyAV6fnEYjfV1bkPsqdO7SagOjlub83uUrs"; // API Key kosong, akan diisi oleh runtime
+
+        const createChatLi = (message, className) => {
+            const chatLi = document.createElement("li");
+            chatLi.classList.add("chat", className);
+            let chatContent = className === "outgoing" ? `<p></p>` : `<span class="mr-2 text-teal-600"><i class="fas fa-robot"></i></span><p></p>`;
+            chatLi.innerHTML = chatContent;
+            chatLi.querySelector("p").textContent = message;
+            return chatLi;
+        }
+
+        // FUNGSI UNTUK GENERATE RESPON DENGAN GEMINI API
+        const generateResponse = async (userMessage) => {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            // Tambahkan pesan user ke riwayat chat (sebelum dipanggil ke API)
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+            const payload = {
+                contents: chatHistory.filter(msg => msg.role !== 'system'), // Kirim hanya user/model parts
+                systemInstruction: chatHistory.find(msg => msg.role === 'system').parts[0].text, // Kirim system instruction terpisah
+                tools: [{ "google_search": {} }], // Aktifkan Google Search untuk pertanyaan umum
+            };
+
+            let responseText = "Terjadi kesalahan. Silakan coba lagi.";
+            let maxRetries = 5;
+            let delay = 1000; // Mulai dari 1 detik
+            let success = false; // Flag untuk melacak keberhasilan
+            
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        // Log status error untuk debugging
+                        console.error(`API Error: HTTP status ${response.status}`);
+                        
+                        // Jika bukan 429, throw error untuk segera ditangkap
+                        if (response.status !== 429) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        // Jika 429 (Too Many Requests), coba lagi dengan delay
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Exponential backoff
+                        continue; 
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        responseText = candidate.content.parts[0].text;
+                        // Tambahkan respon model ke riwayat chat HANYA jika berhasil
+                        chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+                        success = true; // Set flag berhasil
+                        break; // Berhasil, keluar dari loop retry
+                    } else {
+                        // Respon OK, tetapi tidak ada konten teks (e.g., filter keamanan)
+                        responseText = "Maaf, AI tidak dapat menghasilkan respon yang sesuai dengan kebijakan. Coba pertanyaan lain.";
+                        success = false;
+                        break;
+                    }
+                } catch (error) {
+                    console.error("API Fetch/Process Error:", error);
+                    // Coba lagi dengan backoff jika terjadi error jaringan/timeout/non-429 HTTP error
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; 
+                    } else {
+                         // Setelah semua retry gagal
+                        responseText = "Maaf, terjadi masalah koneksi atau server. Silakan coba lagi nanti.";
+                        success = false;
+                        break; // Hentikan percobaan
+                    }
+                }
+            }
+
+            // Rollback chat history jika tidak berhasil
+            if (!success) {
+                // Hapus pesan pengguna terakhir yang gagal mendapatkan respons
+                if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === "user") {
+                    chatHistory.pop();
+                }
+            }
+
+            // Remove "Typing..." and add real message
+            const incomingChatLi = document.querySelector('.chatbox .incoming:last-child');
+            if(incomingChatLi) {
+                chatbox.removeChild(incomingChatLi);
+            }
+
+            chatbox.appendChild(createChatLi(responseText, "incoming"));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
+
+        const handleChat = () => {
+            const userMessage = chatInput.value.trim();
+            if(!userMessage) return;
+
+            // Tambahkan pesan user ke UI
+            chatInput.value = "";
+            chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            
+            // Tampilkan "Sedang mengetik..."
+            const incomingChatLi = createChatLi("Sedang mengetik...", "incoming");
+            chatbox.appendChild(incomingChatLi);
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+
+            generateResponse(userMessage);
+        }
+
+        sendBtn.addEventListener("click", handleChat);
+        chatInput.addEventListener("keydown", (e) => {
+            if(e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleChat();
+            }
+        });
+
+    </script>
+</body>
+</html>
